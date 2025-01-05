@@ -73,7 +73,16 @@ class ImageViewModel: ObservableObject {
         return
       }
       
+      let rectangles: [CGRect] = request.results?.compactMap {
+        guard let observation = $0 as? VNFaceObservation else { return nil }
+        return observation.boundingBox
+      } ?? []
+      
       //process the results
+      DispatchQueue.main.async {
+        self?.faceRectangles = rectangles
+        self?.errorMessage = rectangles.isEmpty ? "No faces detected" : nil
+      }
     }
     
 #if targetEnvironment(simulator)
